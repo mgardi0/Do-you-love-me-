@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پرسیارێک؟</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rudaw&family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        /* دیزاینی گشتی */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            font-family: 'Vazirmatn', sans-serif;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        /* کارتە سەرەکییەکە */
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 90%;
+            width: 400px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* نوسینی پرسیارەکە */
+        h1 {
+            color: #ff4b4b;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* بەشی دوگمەکان */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative; /* گرنگە بۆ جووڵەی دوگمەکە */
+            min-height: 60px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        /* دوگمەی بەڵێ */
+        #yesBtn {
+            background-color: #ff4b4b;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 75, 75, 0.4);
+        }
+
+        #yesBtn:hover {
+            transform: scale(1.1);
+            background-color: #e03e3e;
+        }
+
+        /* دوگمەی نەخێر */
+        #noBtn {
+            background-color: #e0e0e0;
+            color: #333;
+            position: relative; /* سەرەتا ئاساییە، دواتر دەبێتە absolute */
+        }
+
+        /* بەشی دەرکەوتنی نوسینەکەی کۆتایی */
+        #messageContainer {
+            display: none; /* سەرەتا دیار نییە */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 20;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        #messageContainer h1 {
+            font-size: 3rem;
+            color: #ff4b4b;
+            animation: heartBeat 1.5s infinite;
+        }
+
+        #heartIcon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            color: #ff4b4b;
+        }
+
+        /* ئەنیمەیشنی لێدانی دڵ */
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.3); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.3); }
+            70% { transform: scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainCard">
+        <h1>حەمەت خۆشدەوێت؟</h1>
+        <div class="btn-group">
+            <button id="yesBtn">بەڵێ</button>
+            <button id="noBtn">نەخێر</button>
+        </div>
+    </div>
+
+    <div id="messageContainer">
+        <div id="heartIcon">❤️</div>
+        <h1>منیش خۆشم دەوێی</h1>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const mainCard = document.getElementById('mainCard');
+        const messageContainer = document.getElementById('messageContainer');
+
+        // فەنکشنی ڕاکردنی دوگمەی نەخێر
+        function moveButton() {
+            // وەرگرتنی قەبارەی پەنجەرەکە
+            const containerRect = mainCard.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+
+            // هەژمارکردنی شوێنێکی هەڕەمەکی نوێ بەڵام لەناو سنووری شاشەکەدا
+            const maxX = window.innerWidth - btnRect.width - 20;
+            const maxY = window.innerHeight - btnRect.width - 20;
+
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            // گۆڕینی پۆزیشنی دوگمەکە بۆ Absolute بۆ ئەوەی ئازادانە بجوڵێت
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        }
+
+        // کاتێک ماوس دەچێتە سەر دوگمەی نەخێر
+        noBtn.addEventListener('mouseover', moveButton);
+        // بۆ مۆبایل: کاتێک دەستی لێ دەدرێت
+        noBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // ڕێگری لە کلیککردن
+            moveButton();
+        });
+
+        // کاتێک دوگمەی بەڵێ داگرترا
+        yesBtn.addEventListener('click', () => {
+            // 1. تەقاندنەوەی دڵ و گوڵ (Confetti)
+            var duration = 3000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff0000', '#ffb6c1', '#ffffff'] // ڕەنگی سوور و پەمەیی و سپی
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff0000', '#ffb6c1', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+
+            // 2. شاردنەوەی پرسیارەکە و دەرخستنی وەڵامەکە بە Fade
+            setTimeout(() => {
+                mainCard.style.display = 'none'; // شاردنەوەی کارتەکە
+                messageContainer.style.display = 'flex'; // دەرخستنی پەیامەکە
+                
+                // کەمێک دواخستن بۆ ئەوەی ئەنیمەیشنی opacity کار بکات
+                setTimeout(() => {
+                    messageContainer.style.opacity = '1';
+                }, 50);
+                
+                // تەقینەوەیەکی گەورەتر لە کۆتاییدا
+                confetti({
+                    particleCount: 150,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                    colors: ['#ff0000', '#ff4b4b']
+                });
+            }, 500);
+        });
+
+    </script>
+</body>
+</html>
